@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesket & Medical Support Campaign</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #countdown { font-size: 2em; margin: 20px; }
+        .hidden { display: none; }
+        .folder { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Deadline Countdown</h1>
+    <div id="countdown"></div>
+    <button onclick="editDeadline()">Edit Deadline</button>
+    <br><br>
+    
+    <h2>Folders & Links</h2>
+    <div id="folders"></div>
+    <button onclick="editFolders()">Edit Folders</button>
+    
+    <script>
+        let countdownDate = localStorage.getItem("deadline") || "2025-12-31T23:59:59";
+        let folders = JSON.parse(localStorage.getItem("folders")) || [];
+        
+        function updateCountdown() {
+            let now = new Date().getTime();
+            let distance = new Date(countdownDate) - now;
+            
+            if (distance < 0) {
+                document.getElementById("countdown").innerHTML = "Deadline Passed!";
+                return;
+            }
+            
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        function editDeadline() {
+            let pass = prompt("Enter password to edit:");
+            if (pass === "admin") {
+                let newDate = prompt("Enter new deadline (YYYY-MM-DDTHH:MM:SS):");
+                if (newDate) {
+                    countdownDate = newDate;
+                    localStorage.setItem("deadline", newDate);
+                    updateCountdown();
+                }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+        
+        function renderFolders() {
+            let folderDiv = document.getElementById("folders");
+            folderDiv.innerHTML = "";
+            folders.forEach(folder => {
+                let div = document.createElement("div");
+                div.className = "folder";
+                div.innerHTML = `<a href="${folder.link}" target="_blank">${folder.name}</a>`;
+                folderDiv.appendChild(div);
+            });
+        }
+        renderFolders();
+        
+        function editFolders() {
+            let pass = prompt("Enter password to edit:");
+            if (pass === "admin") {
+                let newFolders = prompt("Enter folders in format: Name1,URL1;Name2,URL2");
+                if (newFolders) {
+                    folders = newFolders.split(";").map(item => {
+                        let parts = item.split(",");
+                        return { name: parts[0], link: parts[1] };
+                    });
+                    localStorage.setItem("folders", JSON.stringify(folders));
+                    renderFolders();
+                }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+    </script>
+</body>
+</html>
