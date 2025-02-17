@@ -18,10 +18,14 @@
             font-weight: bold;
         }
         .folder { 
-            margin: 10px 0; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px auto; 
             padding: 10px; 
             background: rgba(255, 255, 255, 0.2); 
             border-radius: 10px;
+            width: 60%;
         }
         button {
             background-color: white;
@@ -33,10 +37,12 @@
             margin: 10px;
             font-size: 1em;
         }
-        .add-button {
+        .icon-button {
             font-size: 1.5em;
-            margin-left: 10px;
             cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
         }
     </style>
 </head>
@@ -94,7 +100,8 @@
                 let div = document.createElement("div");
                 div.className = "folder";
                 div.innerHTML = `<a href="${folder.link}" target="_blank">${folder.name}</a> 
-                <span class='add-button' onclick='addFolder()'>➕</span>`;
+                <button class='icon-button' onclick='addFolder()'>➕</button>
+                <button class='icon-button' onclick='deleteFolder(${index})'>➖</button>`;
                 folderDiv.appendChild(div);
             });
         }
@@ -127,6 +134,17 @@
                     localStorage.setItem("folders", JSON.stringify(folders));
                     renderFolders();
                 }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+        
+        function deleteFolder(index) {
+            let pass = prompt("Enter password to delete:");
+            if (pass === "admin") {
+                folders.splice(index, 1);
+                localStorage.setItem("folders", JSON.stringify(folders));
+                renderFolders();
             } else {
                 alert("Wrong password!");
             }
