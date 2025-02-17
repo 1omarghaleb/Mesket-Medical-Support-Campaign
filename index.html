@@ -5,14 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mesket & Medical Support Campaign</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        #countdown { font-size: 2em; margin: 20px; }
-        .hidden { display: none; }
-        .folder { margin: 10px 0; }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 20px; 
+            background-color: #660066; 
+            color: white; 
+        }
+        #countdown { 
+            font-size: 3em; 
+            margin: 20px; 
+            font-weight: bold;
+        }
+        .folder { 
+            margin: 10px 0; 
+            padding: 10px; 
+            background: rgba(255, 255, 255, 0.2); 
+            border-radius: 10px;
+        }
+        button {
+            background-color: white;
+            color: #660066;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 1em;
+        }
+        .add-button {
+            font-size: 1.5em;
+            margin-left: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>Deadline Countdown</h1>
+    <h1>Mesket & Medical Support Campaign</h1>
     <div id="countdown"></div>
     <button onclick="editDeadline()">Edit Deadline</button>
     <br><br>
@@ -61,10 +90,11 @@
         function renderFolders() {
             let folderDiv = document.getElementById("folders");
             folderDiv.innerHTML = "";
-            folders.forEach(folder => {
+            folders.forEach((folder, index) => {
                 let div = document.createElement("div");
                 div.className = "folder";
-                div.innerHTML = `<a href="${folder.link}" target="_blank">${folder.name}</a>`;
+                div.innerHTML = `<a href="${folder.link}" target="_blank">${folder.name}</a> 
+                <span class='add-button' onclick='addFolder()'>➕</span>`;
                 folderDiv.appendChild(div);
             });
         }
@@ -79,6 +109,21 @@
                         let parts = item.split(",");
                         return { name: parts[0], link: parts[1] };
                     });
+                    localStorage.setItem("folders", JSON.stringify(folders));
+                    renderFolders();
+                }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+        
+        function addFolder() {
+            let pass = prompt("Enter password to add a folder:");
+            if (pass === "admin") {
+                let name = prompt("Enter folder name:");
+                let link = prompt("Enter folder link:");
+                if (name && link) {
+                    folders.push({ name, link });
                     localStorage.setItem("folders", JSON.stringify(folders));
                     renderFolders();
                 }
