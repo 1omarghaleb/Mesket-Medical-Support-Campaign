@@ -4,58 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mesket & Medical Support Campaign</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-        
-        body { 
-            font-family: 'Bebas Neue', sans-serif; 
-            text-align: center; 
-            margin: 20px; 
-            background: url('background.jpg') no-repeat center center fixed; 
-            background-size: cover; 
-            color: white; 
-        }
-        #countdown { 
-            font-size: 3em; 
-            margin: 20px; 
-            font-weight: bold;
-        }
-        .folder { 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px auto; 
-            padding: 10px; 
-            background: rgba(255, 255, 255, 0.2); 
-            border-radius: 10px;
-            width: 60%;
-        }
-        button {
-            background-color: white;
-            color: #660066;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
-            font-size: 1em;
-            font-family: 'Bebas Neue', sans-serif;
-        }
-        .icon-button {
-            font-size: 1.5em;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: white;
-        }
-        a {
-            color: white;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Mesket & Medical Support Campaign</h1>
@@ -110,7 +59,121 @@
             folders.forEach((folder, index) => {
                 let div = document.createElement("div");
                 div.className = "folder";
-                div.innerHTML = `<a href="${folder.link}" target="_blank">${folder.name}</a> 
+                div.innerHTML = `<a href="${folder.link}" target="_blank" class="folder-link">${folder.name}</a> 
+                <button class='icon-button' onclick='addFolder()'>➕</button>
+                <button class='icon-button' onclick='deleteFolder(${index})'>➖</button>`;
+                folderDiv.appendChild(div);
+            });
+        }
+        renderFolders();
+        
+        function editFolders() {
+            let pass = prompt("Enter password to edit:");
+            if (pass === "admin") {
+                let newFolders = prompt("Enter folders in format: Name1,URL1;Name2,URL2");
+                if (newFolders) {
+                    folders = newFolders.split(";").map(item => {
+                        let parts = item.split(",");
+                        return { name: parts[0], link: parts[1] };
+                    });
+                    localStorage.setItem("folders", JSON.stringify(folders));
+                    renderFolders();
+                }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+        
+        function addFolder() {
+            let pass = prompt("Enter password to add a folder:");
+            if (pass === "admin") {
+                let name = prompt("Enter folder name:");
+                let link = prompt("Enter folder link:");
+                if (name && link) {
+                    folders.push({ name, link });
+                    localStorage.setItem("folders", JSON.stringify(folders));
+                    renderFolders();
+                }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+        
+        function deleteFolder(index) {
+            let pass = prompt("Enter password to delete:");
+            if (pass === "admin") {
+                folders.splice(index, 1);
+                localStorage.setItem("folders", JSON.stringify(folders));
+                renderFolders();
+            } else {
+                alert("Wrong password!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesket & Medical Support Campaign</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Mesket & Medical Support Campaign</h1>
+    <div id="countdown"></div>
+    <button onclick="editDeadline()">Edit Deadline</button>
+    <br><br>
+    
+    <h2>Folders & Links</h2>
+    <div id="folders"></div>
+    <button onclick="editFolders()">Edit Folders</button>
+    
+    <script>
+        let countdownDate = localStorage.getItem("deadline") || "2025-12-31T23:59:59";
+        let folders = JSON.parse(localStorage.getItem("folders")) || [];
+        
+        function updateCountdown() {
+            let now = new Date().getTime();
+            let distance = new Date(countdownDate) - now;
+            
+            if (distance < 0) {
+                document.getElementById("countdown").innerHTML = "Deadline Passed!";
+                return;
+            }
+            
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        function editDeadline() {
+            let pass = prompt("Enter password to edit:");
+            if (pass === "admin") {
+                let newDate = prompt("Enter new deadline (YYYY-MM-DDTHH:MM:SS):");
+                if (newDate) {
+                    countdownDate = newDate;
+                    localStorage.setItem("deadline", newDate);
+                    updateCountdown();
+                }
+            } else {
+                alert("Wrong password!");
+            }
+        }
+        
+        function renderFolders() {
+            let folderDiv = document.getElementById("folders");
+            folderDiv.innerHTML = "";
+            folders.forEach((folder, index) => {
+                let div = document.createElement("div");
+                div.className = "folder";
+                div.innerHTML = `<a href="${folder.link}" target="_blank" class="folder-link">${folder.name}</a> 
                 <button class='icon-button' onclick='addFolder()'>➕</button>
                 <button class='icon-button' onclick='deleteFolder(${index})'>➖</button>`;
                 folderDiv.appendChild(div);
